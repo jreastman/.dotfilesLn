@@ -28,4 +28,3 @@ shopt -s nocaseglob # **
 source ~/code/prompt
 # useful functions/alias list
 source ~/code/func
-/dev/disk/by-id/
