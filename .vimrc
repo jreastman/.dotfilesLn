@@ -17,6 +17,9 @@ set smartindent
 set hlsearch
 set incsearch
 
+" indent-guides
+let g:indent_guides_enable_on_vim_startup = 1
+
 " NERDtree
 autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif

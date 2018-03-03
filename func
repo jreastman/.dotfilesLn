@@ -1,0 +1,66 @@
+#!/bin/bash
+
+
+# launch st with larger font
+alias stl="st -f 'hermit:size=16'"
+
+update(){
+        BUILD_DIR="$HOME/builds"
+        # Pull all builds for manual review and install
+        if [ "$PWD" = "$HOME/builds"  ]; then
+          for d in */ ; do
+                  printf '\n\e[1;34m%-6s\e[m\n' "JRE -> $d"
+                  cd $d
+                  git pull
+                  bash ./install 2> /dev/null
+                  cd ..
+          done
+        else
+                echo "Not in builds directory"
+        fi
+
+        # update binaries
+        sudo pacman -Syu
+
+        printf '\e[1;31m%-6s\e[m\n' "####################################"
+        printf '\e[1;32m%-6s\e[m\n' "# Now go to the builds dir and     #"
+        printf '\e[1;33m%-6s\e[m\n' "# review changes.                  #"
+        printf '\e[1;34m%-6s\e[m\n' "# run the specific install command #"
+        printf '\e[1;33m%-6s\e[m\n' "# for easch repository             #"
+        printf '\e[1;32m%-6s\e[m\n' "# that was not auto-installed      #"
+        printf '\e[1;31m%-6s\e[m\n' "####################################"
+}
+
+# Pacman wrapper 
+get() {
+ 
+  /home/jre/code/go/archnews/main
+  case $1 in 
+		in) sudo pacman -Syu $2 ;;
+		out) sudo pacman -Rds $2;;
+		up) update            ;;
+		*)  echo "bad args"     ;;
+	esac
+
+}
+
+# Git cycle
+ppp(){
+        if [ -d "./.git" ];then
+          git add . 
+          git commit -a 
+          git push
+        else
+          echo -e "$(pwd) is not a git repository\n Run 'git init'."
+        fi
+}
+
+# Alias'
+alias ls='ls -l --color=auto'
+alias grep='grep --color=auto'
+alias devs='ls /dev/disk/by-*'
+
+# Get rid of the stupid ass Desktop/Download foldesr 
+# that some applications automatically generate
+rm -r ~/Downloads 2> /dev/null
+rm -r ~/Desktop 2> /dev/null

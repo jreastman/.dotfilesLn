@@ -1,0 +1,24 @@
+#!/bin/bash
+
+## set colors
+t="\[\033[0;34m\]"
+p="\[\033[0;35m\]"
+g="\[\033[0;32m\]"
+b="\[\033[0;36m\]"
+y="\[\033[0;33m\]"
+## the color reset code
+re="\[\033[0m\]"
+
+
+
+## inserts git brance into prompt at $(PBG)
+PBG(){
+        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+
+## inserts battery percentage into prompt @ $(BATT)
+BATT(){
+        acpi | awk '{print $4}' | sed -e 's/,//'
+}
+
+PS1="$b($re$y\$(BATT)$re$p \h$re $gλ$re $g\W$re$t \$(PBG)$re$b)$re "
