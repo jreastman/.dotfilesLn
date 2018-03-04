@@ -1,0 +1,86 @@
+#!/usr/bin/bash
+
+#                 ___           ___
+#    ___         /\  \         /\__\
+#   /\__\       /::\  \       /:/ _/_
+#  /:/__/      /:/\:\__\     /:/ /\__\
+# /::\  \     /:/ /:/  /    /:/ /:/ _/_
+# \/\:\  \   /:/_/:/__/___ /:/_/:/ /\__\
+#    \:\  \  \:\/:::::/  / \:\/:/ /:/  /
+#     \:\__\  \::/~~/~~~~   \::/_/:/  /
+#     /:/  /   \:\~~\        \:\/:/  /
+#    /:/  /     \:\__\        \::/  /
+#    \/__/       \/__/         \/__/
+#
+
+
+#  Post install script for Archlinux, for streamlining re-installs
+#
+#  Puts together a minimalist Archlinux environment with:
+#  - DWM X
+#  - simple terminal X
+#  - vim + config and plugins
+#  - surf X
+#  - dmenu X
+#  - git X
+
+
+
+
+
+# ensure that sudo is used
+if [[ $EUID -ne 0 ]]; then
+  echo "Please run this script using sudo." 
+  exit 1
+fi
+
+# ensure that script is running in a normal users home dir, and not within root's home dir
+if [[ $PWD == '/root' ]]; then
+  echo -e "Run this script AFTER creating and logging into a normal user account \n !!! it is useless..unsafe..silly..etc to use the root directory."
+  exit 1
+fi
+
+
+# create supercool(tm) home directory structure
+mkdir -p media/{audio,video,images} c0de/{builds, playground, projects} docs/{notes, books}
+
+## Tool Installation
+# binaries
+pacman -Syy
+pacman -Syu base-devel git vim go go-tools perl 
+
+githubUrl='https://github.com'
+builds="~/c0de/builds/"
+
+if [[ -e '/usr/bin/Xorg' ]]; then
+  sucklessGitUrl="https://git.suckless.org"
+  
+  git clone $sucklessGitUrl/dmenu $builds/dmenu
+  git clone $sucklessGitUrl/st    $builds/st
+  git clone $sucklessGitUrl/surf  $builds/surf
+  git clone $sucklessGitUrl/dwm   $builds/dwm
+  
+  sed -i.bak -e 's/X11R6\/include/include\/X11/g' -e 's/X11R6\/lib/lib\/X11/g' $builds/dwm/config.mk    ; make clean install -C $builds/dwm/
+  sed -i.bak -e 's/X11R6\/include/include\/X11/g' -e 's/X11R6\/lib/lib\/X11/g' $builds/dmenu/config.mk  ; make clean install -C $builds/dmenu/
+  sed -i.bak -e 's/X11R6\/include/include\/X11/g' -e 's/X11R6\/lib/lib\/X11/g' $builds/st/config.mk     ; make clean install -C $builds/st/
+  sed -i.bak -e 's/X11R6\/include/include\/X11/g' -e 's/X11R6\/lib/lib\/X11/g' $builds/surf/config.mk   ; make clean install -C $builds/surf/
+
+fi
+
+
+## vim configuration 
+bundleDir="$HOME/.vim/bundle"
+
+rm ~/.vimrc # remove any initialized .vimrc's to avoid multiples
+wget https://raw.githubusercontent.com/jreastman/.dotfilesLn/master/.vimrc # download my vimrc from dotfile repository
+
+# install pathogen
+mkdir -p $HOME/.vim/autoload $HOME/.vim/bundle 
+curl -LSso $HOME/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+git clone $githubUrl/jiangmiao/auto-pairs.git $bundleDir
+git clone $githubUrl/scrooloose/nerdtree.git  $bundleDir
+git clone $githubUrl/vim-syntastic/syntastic  $bundleDir
+git clone $githubUrl/vim-airline/vim-airline  $bundleDir
+git clone $githubUrl/alvan/vim-closetag       $bundleDir
+
